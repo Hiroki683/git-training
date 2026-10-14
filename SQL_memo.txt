@@ -1,0 +1,102 @@
+sudo mysql -u root -p
+
+選んでいるDB表示
+SELECT DATABASE();
+
+選んでいるDB、テーブル表示
+show databases;
+show tables;
+
+
+昇順
+SELECT * FROM station_ranking ORDER BY id ASC;
+降順
+SELECT * FROM station_ranking ORDER BY id DESC;
+
+
+
+
+
+上10行
+SELECT * FROM station_ranking ORDER BY id ASC LIMIT 10;
+
+下10行
+SELECT * FROM station_ranking ORDER BY id DESC LIMIT 10;
+
+飛ばして抽出(1なら2行目から)
+SELECT * FROM station_ranking LIMIT 5 OFFSET 1\G
+
+
+
+見やすく
+SELECT * FROM station_ranking LIMIT 5 OFFSET 1\G
+
+カラム表示
+DESCRIBE テーブル名;
+show columns from テーブル名;
+
+
+SQLファイルの実行
+
+
+カラム追加
+ALTER TABLE station_ranking ADD extra INT DEFAULT 100 NOT NULL AFTER ranking;
+
+
+
+カラム削除
+ALTER TABLE station_ranking DROP extra;
+
+行追加
+INSERT INTO station_ranking (id,year,ranking,extra,roman_name,daily_user) VALUES(1,2015,1,1,"shinjyuku",12345);
+
+INSERT INTO station_ranking (year,ranking,extra,roman_name,daily_user) VALUES(NULL,1,1, "TOKYO" ,12345);
+
+行の修正
+UPDATE station_ranking SET year = 2015 , ranking = 3 WHERE year IS NOT NULL;
+
+行の削除
+DELETE FROM station_ranking WHERE year IS NULL AND roman_name = "";
+
+
+重複無しで抽出
+select DISTINCT prefecture from stations;
+
+重複無しのカウント
+SELECT COUNT(DISTINCT prefecture) FROM stations;
+SELECT COUNT(*) FROM stations;
+↑NULLをカウントする
+
+select COUNT(*) FROM station_ranking WHERE year = NULL;ではなく
+select COUNT(*) FROM station_ranking WHERE year IS NULL;
+select COUNT(year) FROM station_ranking WHERE year IS NOT NULL;
+
+
+bigin、実行
+begin
+rollback
+commit
+※カラム削除などはそのまま実行される
+
+
+集合
+SELECT station_ranking.ranking,stations.* FROM stations INNER JOIN station_ranking ON  stations.roman_name=station_ranking.roman_name WHERE ranking <=5 AND year = "2015" AND stations.prefecture = "東京都" ORDER BY ranking ASC;
+
+条件
+SELECT * FROM station_ranking WHERE year = 2016 LIMIT 5 \G
+SELECT COUNT(*) FROM station_ranking WHERE year = 2015 ;
+SELECT COUNT(*) FROM station_ranking WHERE year IN(2015,2016) ;
+SELECT * FROM station_ranking WHERE year = 2015 AND id >=25 \G
+SELECT * FROM station_ranking WHERE year = 2015 AND roman_name LIKE 'ura%' \G
+
+グループ化、カラム名変更
+SELECT prefecture,COUNT(*) AS count_A FROM stations WHERE prefecture LIKE "%県" GROUP BY prefecture ORDER BY count_A DESC;
+
+グループ化後に条件を追加
+SELECT prefecture,COUNT(*) AS count_A FROM stations WHERE prefecture LIKE "%県" GROUP BY prefecture HAVING count_A > 5 ORDER BY count_A DESC LIMIT 1 OFFSET 1\G
+
+
+
+SQLファイル実行
+ログイン後に
+source world_2.sql
